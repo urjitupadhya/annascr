@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:login_page/login_screen.dart';
 import 'package:login_page/splash_screen.dart';
 
-//11import 'package:flutter_native_splash/flutter_native_splash.dart';
-
 void main() {
-
   runApp(const MyApp());
-
 }
 
 class MyApp extends StatelessWidget {
@@ -18,8 +15,26 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'CARRER FINDER',
       theme: ThemeData.dark(),
-      home: SplashScreen( ),
+      home: FutureBuilder<bool>(
+        future: shouldShowOnboarding(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            if (snapshot.data == true) {
+              return SplashScreen();
+            } else {
+              return BackgroundImageLoginScreen();
+            }
+          } else {
+            return SplashScreen();
+          }
+        },
+      ),
     );
+  }
+
+  Future<bool> shouldShowOnboarding() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getBool('showOnboarding') ?? true;
   }
 }
 
@@ -37,8 +52,6 @@ class BackgroundImageLoginScreen extends StatelessWidget {
             fit: BoxFit.cover,
           ),
           const LoginScreen(),
-
-
         ],
       ),
     );

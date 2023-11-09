@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:login_page/login_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   @override
@@ -51,9 +52,11 @@ class SettingsScreen extends StatelessWidget {
             ListTile(
               title: Text('Sign Out'),
               onTap: () {
-                // Handle sign out logic here
-                // After signing out, navigate to the featured screen
-                Navigator.pop(context);
+               Navigator.pushReplacement(
+    context,
+    MaterialPageRoute(builder: (context) => LoginScreen()),
+  );
+
               },
             ),
           ],

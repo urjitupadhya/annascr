@@ -238,12 +238,12 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           };
 
           // Make a POST request to the API
-          final apiUrl = 'http://localhost:8000/api/register'; // Android emulator
-          // final apiUrl = 'http://localhost:8000/api/register'; // iOS simulator
-          final response = await http.post(
-            Uri.parse(apiUrl),
-            body: registrationData,
-          );
+       
+       final apiUrl = 'http://192.168.29.71:8000/api/register';
+final response = await http.post(
+  Uri.parse(apiUrl),
+  body: registrationData,
+);
 
           if (response.statusCode == 200) {
             // Registration was successful, proceed to onboarding screen
