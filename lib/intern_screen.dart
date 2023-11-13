@@ -70,7 +70,7 @@ class _InternshipSearchPageState extends State<InternshipSearchPage> {
         decoration: BoxDecoration(
           image: DecorationImage(
             image: AssetImage('assets/images/internship.gif'),
-            fit: BoxFit.cover,
+            fit: BoxFit. cover,
           ),
         ),
         child: Column(

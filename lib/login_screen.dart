@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:login_page/onboarding_screen.dart';
-import 'package:login_page/registration_screen.dart';
-import 'package:login_page/widgets/gradient_button.dart';
-import 'package:login_page/widgets/login_field.dart';
-import 'package:login_page/widgets/social_button.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:login_page/onboarding_screen.dart';
+import 'package:login_page/registration_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
@@ -27,61 +24,64 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
-Future<void> loginUser(String email, String password, BuildContext context) async {
-  final url = Uri.parse('http://192.168.29.71:8000/api/login');
 
-  try {
-    final response = await http.post(
-      url,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: json.encode({
-        'email': email,
-        'password': password,
-      }),
-    );
+  @override
+  _LoginScreenState createState() => _LoginScreenState();
+}
 
-    print('Response status: ${response.statusCode}');
-    print('Response body: ${response.body}');
+class _LoginScreenState extends State<LoginScreen> {
+  TextEditingController emailController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
 
-    final Map<String, dynamic> data = json.decode(response.body);
+  Future<void> loginUser(String email, String password, BuildContext context) async {
+    final url = Uri.parse('http://192.168.29.71:8000/api/login');
 
-    if (response.statusCode == 200 && data.containsKey('access_token')) {
-      String accessToken = data['access_token'];
-      String tokenType = data['token_type'];
-      int expiresIn = data['expires_in'];
-
-      await TokenStorage.saveToken(accessToken, tokenType, expiresIn);
-
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => OnboardingScreen(),
-        ),
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: json.encode({
+          'email': email,
+          'password': password,
+        }),
       );
-    } else {
+
+      final Map<String, dynamic> data = json.decode(response.body);
+
+      if (response.statusCode == 200 && data.containsKey('access_token')) {
+        // Successfully logged in, store the token
+        String accessToken = data['access_token'];
+        await TokenStorage.saveToken(accessToken);
+
+        // Navigate to the next screen
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => OnboardingScreen(),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Login failed. ${data["error"] ?? "Unknown error"}'),
+            duration: Duration(seconds: 3),
+          ),
+        );
+      }
+    } catch (error) {
+      print('Error: $error');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Login failed. ${data["error"] ?? "Unknown error"}'),
+          content: Text('Failed to login. Please try again. Check logs for details.'),
           duration: Duration(seconds: 3),
         ),
       );
-      print('Login failed. ${data["error"] ?? "Unknown error"}');
     }
-  } catch (error) {
-    print('Error: $error');
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Failed to login. Please try again. Check logs for details.'),
-        duration: Duration(seconds: 3),
-      ),
-    );
   }
-}
-
 
   @override
   Widget build(BuildContext context) {
@@ -106,36 +106,34 @@ Future<void> loginUser(String email, String password, BuildContext context) asyn
                   ),
                 ),
                 const SizedBox(height: 40),
-                SocialButton(
-                  onPressed: () async {
-                    // Implement social login logic here
-                  },
-                  label: ' Continue with Google  ',
-                  iconPath: 'assets/svg/google.svg',
-                  horizontalPadding: 20,
-                ),
-                const SizedBox(height: 10),
-                const Text(
-                  'or',
-                  style: TextStyle(
-                    fontSize: 25,
+                // Email Input Field
+                TextField(
+                  controller: emailController,
+                  decoration: InputDecoration(
+                    hintText: 'Email',
+                    fillColor: const Color.fromARGB(255, 31, 30, 30),
+                    filled: true,
                   ),
                 ),
                 const SizedBox(height: 15),
-                const LoginField(hintText: 'Email'),
-                const SizedBox(height: 15),
-                const LoginField(hintText: 'Password'),
-                const SizedBox(height: 20),
-                const GradientButton(),
-                const SizedBox(
-                  height: 20,
+                // Password Input Field
+                TextField(
+                  controller: passwordController,
+                  obscureText: true,
+                  decoration: InputDecoration(
+                    hintText: 'Password',
+                    fillColor: const Color.fromARGB(255, 14, 13, 13),
+                    filled: true,
+                  ),
                 ),
+                const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () {
-                    loginUser('user@example.com', 'password', context);
+                    loginUser(emailController.text, passwordController.text, context);
                   },
                   child: const Text('Login'),
                 ),
+                const SizedBox(height: 20),
                 TextButton(
                   onPressed: () {
                     Navigator.push(
@@ -163,20 +161,15 @@ Future<void> loginUser(String email, String password, BuildContext context) asyn
 }
 
 class TokenStorage {
-  static const String _tokenKey = 'access_token';
-  static const String _tokenTypeKey = 'token_type';
-  static const String _expiresInKey = 'expires_in';
+  static const String _tokenKey = 'auth_token';
 
-  static Future<void> saveToken(
-      String accessToken, String tokenType, int expiresIn) async {
+  static Future<void> saveToken(String accessToken) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString(_tokenKey, accessToken);
-    prefs.setString(_tokenTypeKey, tokenType);
-    prefs.setInt(_expiresInKey, expiresIn);
   }
 
   static Future<String?> getToken() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getString(_tokenKey);
-  }
+}
 }

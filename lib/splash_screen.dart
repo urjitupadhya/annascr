@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:login_page/login_screen.dart';
+import 'package:login_page/registration_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   @override
@@ -19,7 +20,7 @@ class _SplashScreenState extends State<SplashScreen> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => LoginScreen(),
+          builder: (context) => RegistrationScreen(),
         ),
       );
     });
@@ -44,7 +45,7 @@ class _SplashScreenState extends State<SplashScreen> {
           Container(
             decoration: BoxDecoration(
               image: DecorationImage(
-                image: AssetImage('assets/icons/icon.png'), // Your image path
+                image: AssetImage('assets/images/applogo.jpg'), // Your image path
                 fit: BoxFit.cover,
               ),
             ),

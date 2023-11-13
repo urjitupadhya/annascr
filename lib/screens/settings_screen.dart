@@ -7,6 +7,7 @@ class SettingsScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('Settings'),
+        automaticallyImplyLeading: false, // Add this line to remove the back button
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -52,11 +53,10 @@ class SettingsScreen extends StatelessWidget {
             ListTile(
               title: Text('Sign Out'),
               onTap: () {
-               Navigator.pushReplacement(
-    context,
-    MaterialPageRoute(builder: (context) => LoginScreen()),
-  );
-
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => LoginScreen()),
+                );
               },
             ),
           ],
@@ -77,4 +77,3 @@ class ChangePasswordScreen extends StatelessWidget {
     );
   }
 }
-

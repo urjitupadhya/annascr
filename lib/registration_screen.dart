@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:login_page/login_screen.dart';
 import 'package:login_page/onboarding_screen.dart';
 
 void main() {
@@ -250,7 +251,7 @@ final response = await http.post(
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => OnboardingScreen(),
+                builder: (context) => LoginScreen(),
               ),
             );
           } else {
